@@ -25,7 +25,7 @@ type Filter = "all" | IssueStatus;
 const filters: Filter[] = ["all", "next", "draft", "queued", "shipped"];
 
 export default function Dashboard() {
-  const { statuses, cycle, reset, ready } = useStatuses();
+  const { statuses, cycle, reset, ready, streak, nextIssue } = useStatuses();
   const { drafts } = useDrafts();
   const { notes, set: setNote } = useNotes();
   const [filter, setFilter] = useState<Filter>("all");
@@ -93,6 +93,41 @@ export default function Dashboard() {
       <div className="barwrap">
         <div className="bar" style={{ width: `${ready ? pct : 0}%` }} />
       </div>
+
+      {ready && nextIssue && (
+        <div className="today">
+          <div className="todaymain">
+            <div className="todaylabel">Today</div>
+            <div className="todayissue">
+              Issue {nextIssue.n}: {nextIssue.theme}
+            </div>
+            <div className="todaywins">{nextIssue.wins.join(" · ")}</div>
+          </div>
+          <div className="todayside">
+            <div className="streak">
+              <span className="streaknum">{streak}</span>
+              <span className="streaklbl">day streak</span>
+            </div>
+            <Link className="mini gold" href={`/builder?issue=${nextIssue.n}`}>
+              write it
+            </Link>
+          </div>
+        </div>
+      )}
+      {ready && !nextIssue && (
+        <div className="today">
+          <div className="todaymain">
+            <div className="todaylabel">Series complete</div>
+            <div className="todayissue">all 9 issues shipped. keep building.</div>
+          </div>
+          <div className="todayside">
+            <div className="streak">
+              <span className="streaknum">{streak}</span>
+              <span className="streaklbl">day streak</span>
+            </div>
+          </div>
+        </div>
+      )}
 
       <h2>The Pipeline</h2>
       <div className="filters">
