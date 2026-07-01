@@ -175,6 +175,54 @@ h2 {
   letter-spacing: 0.5px;
   font-weight: 700;
 }
+.pillbtn {
+  cursor: pointer;
+  font-family: inherit;
+}
+.headrow {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.headrow button {
+  margin-left: auto;
+  flex: 0 0 auto;
+}
+.issuefoot {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 11px;
+}
+.issuefoot .need {
+  margin-top: 0;
+}
+.issueactions {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+.mini {
+  background: var(--navy3);
+  border: 1px solid var(--line);
+  color: var(--dim);
+  border-radius: 7px;
+  padding: 4px 11px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.mini.gold {
+  color: var(--navy);
+  background: var(--gold);
+  border-color: var(--gold);
+  font-weight: 600;
+}
+.mini:hover {
+  text-decoration: none;
+  border-color: var(--gold2);
+}
 .p-next {
   background: rgba(224, 195, 106, 0.16);
   color: var(--amber);

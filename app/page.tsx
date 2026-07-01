@@ -1,8 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { issues, type IssueStatus } from "@/lib/issues";
 import { voiceDo, voiceDont } from "@/lib/voice";
+import { useStatuses } from "@/lib/useStatuses";
 
 const pillClass: Record<IssueStatus, string> = {
   next: "p-next",
@@ -18,51 +20,72 @@ const pillText: Record<IssueStatus, string> = {
 };
 
 type Filter = "all" | IssueStatus;
-const filters: Filter[] = ["all", "next", "draft", "shipped"];
+const filters: Filter[] = ["all", "next", "draft", "queued", "shipped"];
 
 export default function Dashboard() {
+  const { statuses, cycle, reset, ready } = useStatuses();
   const [filter, setFilter] = useState<Filter>("all");
-  const shipped = issues.filter((i) => i.status === "shipped").length;
-  const shown = issues.filter((i) => filter === "all" || i.status === filter);
+  const [toast, setToast] = useState("");
+
+  const shipped = issues.filter((i) => statuses[i.n] === "shipped").length;
+  const nextUp = issues.filter((i) => statuses[i.n] === "next").length;
+  const shown = issues.filter(
+    (i) => filter === "all" || statuses[i.n] === filter
+  );
   const pct = Math.round((shipped / issues.length) * 100);
+
+  function copyBrief(n: number) {
+    const i = issues.find((x) => x.n === n)!;
+    const brief = `Issue ${i.n} - ${i.theme}\n\n${i.wins
+      .map((w) => `- ${w}`)
+      .join("\n")}\n\nZOE needs: ${i.need}`;
+    navigator.clipboard.writeText(brief).then(() => {
+      setToast(`copied brief for issue ${n}`);
+      setTimeout(() => setToast(""), 1500);
+    });
+  }
 
   return (
     <>
-      <h1>
-        <span style={{ color: "var(--gold)" }}>ZM.</span> Newsletter Control
-      </h1>
-      <div className="sub">
-        daily-3 loop, reframed from the Q2 recap. one issue = 3 wins, in ZAO
-        voice.
+      <div className="headrow">
+        <div>
+          <h1>
+            <span style={{ color: "var(--gold)" }}>ZM.</span> Newsletter Control
+          </h1>
+          <div className="sub">
+            daily-3 loop. one issue = 3 wins, in ZAO voice. click a status to
+            advance it.
+          </div>
+        </div>
+        <button className="fbtn" onClick={reset} title="reset all statuses">
+          reset
+        </button>
       </div>
 
       <div className="grid">
         <div className="stat">
           <div className="n">{issues.length}</div>
-          <div className="l">issues to cover Q2</div>
+          <div className="l">issues</div>
         </div>
         <div className="stat">
           <div className="n">{issues.length * 3}</div>
           <div className="l">wins queued</div>
         </div>
         <div className="stat">
-          <div className="n">{issues.filter((i) => i.status === "next").length}</div>
+          <div className="n">{ready ? nextUp : "-"}</div>
           <div className="l">next up</div>
         </div>
         <div className="stat">
-          <div className="n">{shipped}</div>
+          <div className="n">{ready ? shipped : "-"}</div>
           <div className="l">shipped</div>
         </div>
         <div className="stat">
-          <div className="n">~350</div>
-          <div className="l">words per issue</div>
+          <div className="n">{ready ? `${pct}%` : "-"}</div>
+          <div className="l">complete</div>
         </div>
       </div>
       <div className="barwrap">
-        <div className="bar" style={{ width: `${pct}%` }} />
-      </div>
-      <div className="sub" style={{ marginTop: 6 }}>
-        {shipped} of {issues.length} shipped. sequence ordered biggest-first.
+        <div className="bar" style={{ width: `${ready ? pct : 0}%` }} />
       </div>
 
       <h2>The Pipeline</h2>
@@ -78,31 +101,45 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {shown.map((i) => (
-        <div
-          key={i.n}
-          className={"issue" + (i.status === "shipped" ? " done" : "")}
-        >
-          <div className="ihead">
-            <div className="num">{i.n}</div>
-            <div className="theme">{i.theme}</div>
-            <span className={"pill " + pillClass[i.status]}>
-              {pillText[i.status]}
-            </span>
+      {shown.map((i) => {
+        const st = statuses[i.n];
+        return (
+          <div key={i.n} className={"issue" + (st === "shipped" ? " done" : "")}>
+            <div className="ihead">
+              <div className="num">{i.n}</div>
+              <div className="theme">{i.theme}</div>
+              <button
+                className={"pill pillbtn " + pillClass[st]}
+                onClick={() => cycle(i.n)}
+                title="click to advance status"
+              >
+                {pillText[st]}
+              </button>
+            </div>
+            <ul className="wins">
+              {i.wins.map((w, idx) => (
+                <li key={idx}>
+                  <span className="dot">-</span>
+                  <span>{w}</span>
+                </li>
+              ))}
+            </ul>
+            <div className="issuefoot">
+              <div className="need">
+                <b>ZOE needs:</b> {i.need}
+              </div>
+              <div className="issueactions">
+                <button className="mini" onClick={() => copyBrief(i.n)}>
+                  copy brief
+                </button>
+                <Link className="mini gold" href={`/builder?issue=${i.n}`}>
+                  compose
+                </Link>
+              </div>
+            </div>
           </div>
-          <ul className="wins">
-            {i.wins.map((w, idx) => (
-              <li key={idx}>
-                <span className="dot">-</span>
-                <span>{w}</span>
-              </li>
-            ))}
-          </ul>
-          <div className="need">
-            <b>ZOE needs:</b> {i.need}
-          </div>
-        </div>
-      ))}
+        );
+      })}
 
       <h2>Format + Voice</h2>
       <div className="cardrow">
@@ -125,6 +162,8 @@ export default function Dashboard() {
           </ul>
         </div>
       </div>
+
+      {toast && <div className="toast">{toast}</div>}
     </>
   );
 }

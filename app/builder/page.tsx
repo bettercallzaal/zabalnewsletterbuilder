@@ -1,11 +1,18 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { issues } from "@/lib/issues";
 import { bannedWords, signOff, voicePhrases } from "@/lib/voice";
 
-export default function Builder() {
-  const [idx, setIdx] = useState(0);
+function BuilderInner() {
+  const params = useSearchParams();
+  const initial = Math.max(
+    0,
+    issues.findIndex((i) => String(i.n) === params.get("issue"))
+  );
+
+  const [idx, setIdx] = useState(initial);
   const issue = issues[idx];
 
   const [themeLine, setThemeLine] = useState(
@@ -15,7 +22,15 @@ export default function Builder() {
   const [closer, setCloser] = useState("the quiet work compounds.");
   const [toast, setToast] = useState("");
 
-  // reset blocks when the issue changes
+  // if the ?issue param changes, follow it
+  useEffect(() => {
+    const q = issues.findIndex((i) => String(i.n) === params.get("issue"));
+    if (q >= 0) {
+      setIdx(q);
+      setBlocks(["", "", ""]);
+    }
+  }, [params]);
+
   function pickIssue(newIdx: number) {
     setIdx(newIdx);
     setBlocks(["", "", ""]);
@@ -25,7 +40,10 @@ export default function Builder() {
     const winParas = issue.wins
       .map((w, i) => {
         const body = blocks[i]?.trim();
-        return `${w}\n\n${body || "[write 2-4 short paragraphs here, lead with the build, real numbers, credit people]"}`;
+        return `${w}\n\n${
+          body ||
+          "[write 2-4 short paragraphs here, lead with the build, real numbers, credit people]"
+        }`;
       })
       .join("\n\n");
     return `ZM.\n\n${themeLine}\n\n${winParas}\n\n${closer}\n\n${signOff}`;
@@ -60,17 +78,14 @@ export default function Builder() {
     <>
       <h1>Compose an issue</h1>
       <div className="sub">
-        pick an issue, draft the 3 win blocks, watch it assemble in voice.
-        copy when it reads right.
+        pick an issue, draft the 3 win blocks, watch it assemble in voice. copy
+        when it reads right.
       </div>
 
       <div className="composer">
         <div>
           <label>Issue</label>
-          <select
-            value={idx}
-            onChange={(e) => pickIssue(Number(e.target.value))}
-          >
+          <select value={idx} onChange={(e) => pickIssue(Number(e.target.value))}>
             {issues.map((it, i) => (
               <option key={it.n} value={i}>
                 {it.n}. {it.theme}
@@ -79,10 +94,7 @@ export default function Builder() {
           </select>
 
           <label>Theme line (after ZM.)</label>
-          <input
-            value={themeLine}
-            onChange={(e) => setThemeLine(e.target.value)}
-          />
+          <input value={themeLine} onChange={(e) => setThemeLine(e.target.value)} />
 
           {issue.wins.map((w, i) => (
             <div key={i}>
@@ -131,5 +143,13 @@ export default function Builder() {
 
       {toast && <div className="toast">{toast}</div>}
     </>
+  );
+}
+
+export default function Builder() {
+  return (
+    <Suspense fallback={<div className="sub">loading composer...</div>}>
+      <BuilderInner />
+    </Suspense>
   );
 }
