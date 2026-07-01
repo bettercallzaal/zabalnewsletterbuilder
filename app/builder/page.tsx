@@ -3,10 +3,11 @@
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { issues } from "@/lib/issues";
-import { bannedWords, voicePhrases } from "@/lib/voice";
+import { voicePhrases } from "@/lib/voice";
 import { useDrafts, type Draft } from "@/lib/drafts";
 import { generateStarter } from "@/lib/starter";
 import { assemblePost } from "@/lib/assemble";
+import { scorePost } from "@/lib/score";
 
 function BuilderInner() {
   const params = useSearchParams();
@@ -81,18 +82,7 @@ function BuilderInner() {
   );
 
   const words = post.trim().split(/\s+/).filter(Boolean).length;
-
-  const flags = useMemo(() => {
-    const lower = post.toLowerCase();
-    const out: string[] = [];
-    for (const w of bannedWords) {
-      if (lower.includes(w.toLowerCase())) out.push(`off-voice: "${w}"`);
-    }
-    if (/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}]/u.test(post))
-      out.push("emoji detected - remove it");
-    if (words > 480) out.push(`long: ${words} words (aim ~300-450)`);
-    return out;
-  }, [post, words]);
+  const scored = useMemo(() => scorePost(post), [post]);
 
   function copy() {
     navigator.clipboard.writeText(post).then(() => {
@@ -152,15 +142,32 @@ function BuilderInner() {
           <label>Preview</label>
           <div className="preview">{post}</div>
           <div className="wc">{words} words</div>
-          {flags.length > 0 && (
-            <div className="flags">
-              {flags.map((f, i) => (
-                <div key={i} className="flag">
-                  {f}
-                </div>
-              ))}
+
+          <div className="scorepanel">
+            <div className="scorehead">
+              <span
+                className={
+                  "scoreval " +
+                  (scored.score >= 80
+                    ? "s-good"
+                    : scored.score >= 50
+                    ? "s-mid"
+                    : "s-low")
+                }
+              >
+                {scored.score}
+              </span>
+              <span className="scorelbl">voice score</span>
             </div>
-          )}
+            <ul className="checks">
+              {scored.checks.map((c, i) => (
+                <li key={i} className={c.pass ? "ok" : "no"}>
+                  <span className="ck">{c.pass ? "+" : "-"}</span>
+                  {c.label}
+                </li>
+              ))}
+            </ul>
+          </div>
           <div className="btnrow">
             <button className="btn" onClick={copy}>
               Copy post
