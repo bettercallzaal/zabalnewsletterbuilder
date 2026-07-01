@@ -136,6 +136,15 @@ export default function Dashboard() {
       )}
 
       <h2>The Pipeline</h2>
+      {ready && list.length === 0 && (
+        <div className="empty">
+          no issues yet.{" "}
+          <Link href="/issues" style={{ color: "var(--gold)" }}>
+            add one
+          </Link>{" "}
+          to start the series.
+        </div>
+      )}
       <div className="filters">
         {filters.map((f) => (
           <button

@@ -63,6 +63,41 @@ a:hover {
   margin: 0 auto;
   padding: 26px 18px 90px;
 }
+.empty {
+  background: var(--navy2);
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  padding: 22px;
+  color: var(--dim);
+  text-align: center;
+  font-size: 14px;
+}
+@media (max-width: 560px) {
+  .nav {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 12px 14px;
+  }
+  .navlinks {
+    gap: 12px;
+  }
+  .wrap {
+    padding: 18px 13px 80px;
+  }
+  .today {
+    flex-wrap: wrap;
+  }
+  .todayside {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .issueactions {
+    flex-wrap: wrap;
+  }
+  h1 {
+    font-size: 20px;
+  }
+}
 h1 {
   font-size: 22px;
   margin: 0 0 4px;
