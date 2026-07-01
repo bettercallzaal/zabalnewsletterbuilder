@@ -219,6 +219,15 @@ h2 {
   border-color: var(--gold);
   font-weight: 600;
 }
+.draftbadge {
+  align-self: center;
+  font-size: 11px;
+  color: var(--green);
+  border: 1px solid var(--green);
+  background: rgba(123, 216, 143, 0.1);
+  border-radius: 7px;
+  padding: 3px 8px;
+}
 .mini:hover {
   text-decoration: none;
   border-color: var(--gold2);

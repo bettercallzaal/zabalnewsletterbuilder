@@ -5,6 +5,7 @@ import { useState } from "react";
 import { issues, type IssueStatus } from "@/lib/issues";
 import { voiceDo, voiceDont } from "@/lib/voice";
 import { useStatuses } from "@/lib/useStatuses";
+import { useDrafts, draftWords } from "@/lib/drafts";
 
 const pillClass: Record<IssueStatus, string> = {
   next: "p-next",
@@ -24,8 +25,10 @@ const filters: Filter[] = ["all", "next", "draft", "queued", "shipped"];
 
 export default function Dashboard() {
   const { statuses, cycle, reset, ready } = useStatuses();
+  const { drafts } = useDrafts();
   const [filter, setFilter] = useState<Filter>("all");
   const [toast, setToast] = useState("");
+  const drafted = issues.filter((i) => draftWords(drafts[i.n]) > 0).length;
 
   const shipped = issues.filter((i) => statuses[i.n] === "shipped").length;
   const nextUp = issues.filter((i) => statuses[i.n] === "next").length;
@@ -80,8 +83,8 @@ export default function Dashboard() {
           <div className="l">shipped</div>
         </div>
         <div className="stat">
-          <div className="n">{ready ? `${pct}%` : "-"}</div>
-          <div className="l">complete</div>
+          <div className="n">{ready ? drafted : "-"}</div>
+          <div className="l">drafts started</div>
         </div>
       </div>
       <div className="barwrap">
@@ -129,11 +132,16 @@ export default function Dashboard() {
                 <b>ZOE needs:</b> {i.need}
               </div>
               <div className="issueactions">
+                {draftWords(drafts[i.n]) > 0 && (
+                  <span className="draftbadge">
+                    draft {draftWords(drafts[i.n])}w
+                  </span>
+                )}
                 <button className="mini" onClick={() => copyBrief(i.n)}>
                   copy brief
                 </button>
                 <Link className="mini gold" href={`/builder?issue=${i.n}`}>
-                  compose
+                  {draftWords(drafts[i.n]) > 0 ? "edit" : "compose"}
                 </Link>
               </div>
             </div>
