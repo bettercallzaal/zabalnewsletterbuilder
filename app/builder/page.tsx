@@ -4,7 +4,8 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { issues } from "@/lib/issues";
 import { bannedWords, signOff, voicePhrases } from "@/lib/voice";
-import { useDrafts, emptyDraft, type Draft } from "@/lib/drafts";
+import { useDrafts, type Draft } from "@/lib/drafts";
+import { generateStarter } from "@/lib/starter";
 
 function BuilderInner() {
   const params = useSearchParams();
@@ -16,27 +17,31 @@ function BuilderInner() {
 
   const [idx, setIdx] = useState(initial);
   const issue = issues[idx];
+  const seed = generateStarter(issues[initial]);
 
-  const [themeLine, setThemeLine] = useState(
-    "the quarter we stopped doing the work by hand."
-  );
-  const [blocks, setBlocks] = useState<string[]>(["", "", ""]);
-  const [closer, setCloser] = useState("the quiet work compounds.");
+  const [themeLine, setThemeLine] = useState(seed.themeLine);
+  const [blocks, setBlocks] = useState<string[]>(seed.blocks);
+  const [closer, setCloser] = useState(seed.closer);
   const [toast, setToast] = useState("");
   const [saved, setSaved] = useState(false);
 
-  // load the saved draft for an issue into the fields
+  // load the saved draft for an issue, or open a starter pre-filled from its wins
   function loadDraft(n: number) {
     const d = drafts[n];
-    if (d) {
-      setThemeLine(d.themeLine);
-      setBlocks(d.blocks.length === 3 ? d.blocks : ["", "", ""]);
-      setCloser(d.closer);
-    } else {
-      setThemeLine("the quarter we stopped doing the work by hand.");
-      setBlocks(["", "", ""]);
-      setCloser("the quiet work compounds.");
-    }
+    const it = issues.find((x) => x.n === n)!;
+    const base = d ?? generateStarter(it);
+    setThemeLine(base.themeLine);
+    setBlocks(base.blocks.length === 3 ? base.blocks : ["", "", ""]);
+    setCloser(base.closer);
+  }
+
+  function regenStarter() {
+    const gen = generateStarter(issue);
+    setThemeLine(gen.themeLine);
+    setBlocks(gen.blocks);
+    setCloser(gen.closer);
+    setToast("starter regenerated");
+    setTimeout(() => setToast(""), 1500);
   }
 
   // once drafts have loaded from storage, hydrate the current issue's draft
@@ -68,9 +73,6 @@ function BuilderInner() {
     setToast(`saved draft for issue ${issue.n}`);
     setTimeout(() => setToast(""), 1500);
   }
-
-  // avoid unused-var lint on the imported helper
-  void emptyDraft;
 
   const post = useMemo(() => {
     const winParas = issue.wins
@@ -172,6 +174,9 @@ function BuilderInner() {
             </button>
             <button className="btn ghost" onClick={saveDraft}>
               {saved ? "Saved" : "Save draft"}
+            </button>
+            <button className="btn ghost" onClick={regenStarter}>
+              Regenerate starter
             </button>
             <span className="wc" style={{ alignSelf: "center" }}>
               ZOE needs: {issue.need}
