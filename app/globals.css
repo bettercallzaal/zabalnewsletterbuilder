@@ -572,6 +572,16 @@ textarea {
 .editinput {
   width: 100%;
 }
+.wsinput {
+  width: 140px;
+}
+code {
+  background: var(--navy3);
+  padding: 1px 6px;
+  border-radius: 5px;
+  font-size: 12px;
+  color: var(--gold2);
+}
 .ihead .editinput {
   flex: 1;
   width: auto;

@@ -41,6 +41,16 @@ Next.js is auto-detected. No env vars needed for v1.
 - `lib/issues.ts` - the 9-issue sequence + the 3 wins each. Edit here to reorder or update.
 - `lib/voice.ts` - the do/never voice rules + banned-word list the composer flags.
 
+## Cloud sync (Supabase)
+
+Optional. Without env vars the app runs localStorage-only; the dashboard shows a "not configured" note. To turn it on:
+
+1. In your Supabase project, run `supabase/schema.sql` (creates `newsletter_state` + anon RLS policies).
+2. In Vercel, add `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` (Project Settings -> Environment Variables).
+3. Redeploy.
+
+Then the dashboard "Cloud sync" section lets you push/pull all state under a workspace name (last-write-wins). It reuses the same JSON shape as the local backup, so cloud and file backups are interchangeable.
+
 ## Roadmap
 
 - Persist edits + statuses (Supabase) instead of static data.

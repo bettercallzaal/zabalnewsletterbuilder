@@ -9,6 +9,9 @@ import { useDrafts, draftWords } from "@/lib/drafts";
 import { useNotes } from "@/lib/notes";
 import { useIssues } from "@/lib/useIssues";
 import { downloadBackup, importState } from "@/lib/backup";
+import { hasSupabase } from "@/lib/supabase";
+import { pushCloud, pullCloud } from "@/lib/cloud";
+import { useEffect } from "react";
 
 const pillClass: Record<IssueStatus, string> = {
   next: "p-next",
@@ -34,7 +37,36 @@ export default function Dashboard() {
   const [filter, setFilter] = useState<Filter>("all");
   const [openNotes, setOpenNotes] = useState<number | null>(null);
   const [toast, setToast] = useState("");
+  const [workspace, setWorkspace] = useState("zabal");
+  const [cloudBusy, setCloudBusy] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const w = localStorage.getItem("znb.workspace");
+    if (w) setWorkspace(w);
+  }, []);
+
+  function saveWorkspace(v: string) {
+    setWorkspace(v);
+    localStorage.setItem("znb.workspace", v);
+  }
+
+  async function doPush() {
+    setCloudBusy(true);
+    const res = await pushCloud(workspace);
+    setCloudBusy(false);
+    setToast(res.msg);
+    setTimeout(() => setToast(""), 1800);
+  }
+
+  async function doPull() {
+    setCloudBusy(true);
+    const res = await pullCloud(workspace);
+    setCloudBusy(false);
+    setToast(res.msg);
+    setTimeout(() => setToast(""), 1800);
+    if (res.ok) setTimeout(() => window.location.reload(), 700);
+  }
 
   const ready = issuesReady;
   const statusOf = (n: number, fallback: IssueStatus): IssueStatus =>
@@ -269,6 +301,35 @@ export default function Dashboard() {
           onChange={onImport}
         />
       </div>
+
+      <h2>Cloud sync</h2>
+      {hasSupabase ? (
+        <div className="databar">
+          <span className="sub">sync this browser to the cloud under a workspace name.</span>
+          <span style={{ flex: 1 }} />
+          <input
+            className="wsinput"
+            value={workspace}
+            onChange={(e) => saveWorkspace(e.target.value)}
+            placeholder="workspace"
+          />
+          <button className="mini" onClick={doPush} disabled={cloudBusy}>
+            push
+          </button>
+          <button className="mini gold" onClick={doPull} disabled={cloudBusy}>
+            pull
+          </button>
+        </div>
+      ) : (
+        <div className="databar">
+          <span className="sub">
+            cloud sync is wired but not configured. add{" "}
+            <code>NEXT_PUBLIC_SUPABASE_URL</code> and{" "}
+            <code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code> in Vercel, run the SQL in{" "}
+            <code>supabase/schema.sql</code>, then redeploy.
+          </span>
+        </div>
+      )}
 
       {toast && <div className="toast">{toast}</div>}
     </>
