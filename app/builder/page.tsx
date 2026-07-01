@@ -8,6 +8,7 @@ import { useDrafts, type Draft } from "@/lib/drafts";
 import { generateStarter } from "@/lib/starter";
 import { assemblePost } from "@/lib/assemble";
 import { scorePost } from "@/lib/score";
+import { toFarcaster, toXThread } from "@/lib/variants";
 
 function BuilderInner() {
   const params = useSearchParams();
@@ -83,12 +84,21 @@ function BuilderInner() {
 
   const words = post.trim().split(/\s+/).filter(Boolean).length;
   const scored = useMemo(() => scorePost(post), [post]);
+  const [tab, setTab] = useState<"news" | "fc" | "x">("news");
+  const fc = useMemo(
+    () => toFarcaster(issue, { themeLine, blocks, closer }),
+    [issue, themeLine, blocks, closer]
+  );
+  const xThread = useMemo(() => toXThread(post), [post]);
 
-  function copy() {
-    navigator.clipboard.writeText(post).then(() => {
-      setToast("copied");
+  function copyText(text: string, label = "copied") {
+    navigator.clipboard.writeText(text).then(() => {
+      setToast(label);
       setTimeout(() => setToast(""), 1500);
     });
+  }
+  function copy() {
+    copyText(post);
   }
 
   function setBlock(i: number, val: string) {
@@ -139,7 +149,76 @@ function BuilderInner() {
         </div>
 
         <div>
-          <label>Preview</label>
+          <div className="vtabs">
+            <button
+              className={"vtab" + (tab === "news" ? " on" : "")}
+              onClick={() => setTab("news")}
+            >
+              Newsletter
+            </button>
+            <button
+              className={"vtab" + (tab === "fc" ? " on" : "")}
+              onClick={() => setTab("fc")}
+            >
+              Farcaster
+            </button>
+            <button
+              className={"vtab" + (tab === "x" ? " on" : "")}
+              onClick={() => setTab("x")}
+            >
+              X thread
+            </button>
+          </div>
+
+          {tab === "fc" && (
+            <div>
+              <div className="preview">{fc}</div>
+              <div className="wc">
+                {fc.length}/1024 chars
+                {fc.length > 1024 ? " (over)" : ""}
+              </div>
+              <div className="btnrow">
+                <button
+                  className="btn"
+                  onClick={() => copyText(fc, "copied cast")}
+                >
+                  Copy cast
+                </button>
+              </div>
+            </div>
+          )}
+
+          {tab === "x" && (
+            <div>
+              {xThread.map((t, i) => (
+                <div key={i} className="xpost">
+                  <div className="xbody">{t}</div>
+                  <div className="xfoot">
+                    <span className="wc">{t.length}/280</span>
+                    <button
+                      className="mini"
+                      onClick={() => copyText(t, `copied ${i + 1}/${xThread.length}`)}
+                    >
+                      copy
+                    </button>
+                  </div>
+                </div>
+              ))}
+              <div className="btnrow">
+                <button
+                  className="btn"
+                  onClick={() =>
+                    copyText(xThread.join("\n\n"), "copied full thread")
+                  }
+                >
+                  Copy full thread
+                </button>
+              </div>
+            </div>
+          )}
+
+          {tab === "news" && (
+          <>
           <div className="preview">{post}</div>
           <div className="wc">{words} words</div>
 
@@ -168,6 +247,9 @@ function BuilderInner() {
               ))}
             </ul>
           </div>
+          </>
+          )}
+
           <div className="btnrow">
             <button className="btn" onClick={copy}>
               Copy post
