@@ -411,6 +411,21 @@ textarea {
   border-color: var(--amber);
   background: rgba(224, 195, 106, 0.1);
 }
+.notedot {
+  align-self: center;
+  font-size: 11px;
+  color: var(--amber);
+  border: 1px solid var(--amber);
+  background: rgba(224, 195, 106, 0.08);
+  border-radius: 7px;
+  padding: 3px 8px;
+}
+.notesarea {
+  margin-top: 12px;
+  min-height: 70px;
+  resize: vertical;
+  line-height: 1.5;
+}
 /* read view */
 .post {
   background: var(--navy2);

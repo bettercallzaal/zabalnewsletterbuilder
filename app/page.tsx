@@ -6,6 +6,7 @@ import { issues, type IssueStatus } from "@/lib/issues";
 import { voiceDo, voiceDont } from "@/lib/voice";
 import { useStatuses } from "@/lib/useStatuses";
 import { useDrafts, draftWords } from "@/lib/drafts";
+import { useNotes } from "@/lib/notes";
 
 const pillClass: Record<IssueStatus, string> = {
   next: "p-next",
@@ -26,7 +27,9 @@ const filters: Filter[] = ["all", "next", "draft", "queued", "shipped"];
 export default function Dashboard() {
   const { statuses, cycle, reset, ready } = useStatuses();
   const { drafts } = useDrafts();
+  const { notes, set: setNote } = useNotes();
   const [filter, setFilter] = useState<Filter>("all");
+  const [openNotes, setOpenNotes] = useState<number | null>(null);
   const [toast, setToast] = useState("");
   const drafted = issues.filter((i) => draftWords(drafts[i.n]) > 0).length;
 
@@ -137,6 +140,13 @@ export default function Dashboard() {
                     draft {draftWords(drafts[i.n])}w
                   </span>
                 )}
+                {notes[i.n]?.trim() && <span className="notedot" title="has notes">note</span>}
+                <button
+                  className="mini"
+                  onClick={() => setOpenNotes(openNotes === i.n ? null : i.n)}
+                >
+                  {openNotes === i.n ? "hide notes" : "notes"}
+                </button>
                 <button className="mini" onClick={() => copyBrief(i.n)}>
                   copy brief
                 </button>
@@ -145,6 +155,14 @@ export default function Dashboard() {
                 </Link>
               </div>
             </div>
+            {openNotes === i.n && (
+              <textarea
+                className="notesarea"
+                value={notes[i.n] ?? ""}
+                placeholder="what landed, what to change next time, an angle that resonated..."
+                onChange={(e) => setNote(i.n, e.target.value)}
+              />
+            )}
           </div>
         );
       })}
