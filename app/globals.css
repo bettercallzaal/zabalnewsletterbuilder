@@ -406,3 +406,57 @@ textarea {
   font-weight: 600;
   font-size: 13px;
 }
+.draftbadge.starter {
+  color: var(--amber);
+  border-color: var(--amber);
+  background: rgba(224, 195, 106, 0.1);
+}
+/* read view */
+.post {
+  background: var(--navy2);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 22px 24px;
+  margin-bottom: 16px;
+}
+.posthead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+}
+.postbody {
+  white-space: pre-wrap;
+  font-size: 15px;
+  line-height: 1.65;
+}
+@media print {
+  .nav,
+  .no-print,
+  .posthead {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+    color: #111;
+  }
+  .wrap {
+    max-width: none;
+    padding: 0;
+  }
+  .post {
+    background: #fff;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    margin: 0 0 28px;
+    page-break-inside: avoid;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 20px;
+  }
+  .postbody {
+    color: #111;
+  }
+}

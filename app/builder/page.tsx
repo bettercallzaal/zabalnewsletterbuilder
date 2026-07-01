@@ -3,9 +3,10 @@
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { issues } from "@/lib/issues";
-import { bannedWords, signOff, voicePhrases } from "@/lib/voice";
+import { bannedWords, voicePhrases } from "@/lib/voice";
 import { useDrafts, type Draft } from "@/lib/drafts";
 import { generateStarter } from "@/lib/starter";
+import { assemblePost } from "@/lib/assemble";
 
 function BuilderInner() {
   const params = useSearchParams();
@@ -74,18 +75,10 @@ function BuilderInner() {
     setTimeout(() => setToast(""), 1500);
   }
 
-  const post = useMemo(() => {
-    const winParas = issue.wins
-      .map((w, i) => {
-        const body = blocks[i]?.trim();
-        return `${w}\n\n${
-          body ||
-          "[write 2-4 short paragraphs here, lead with the build, real numbers, credit people]"
-        }`;
-      })
-      .join("\n\n");
-    return `ZM.\n\n${themeLine}\n\n${winParas}\n\n${closer}\n\n${signOff}`;
-  }, [issue, themeLine, blocks, closer]);
+  const post = useMemo(
+    () => assemblePost(issue, { themeLine, blocks, closer }, true),
+    [issue, themeLine, blocks, closer]
+  );
 
   const words = post.trim().split(/\s+/).filter(Boolean).length;
 
