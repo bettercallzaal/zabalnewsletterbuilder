@@ -496,6 +496,16 @@ textarea {
   padding: 2px 7px;
   background: var(--navy);
 }
+.databar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  background: var(--navy2);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
 .today {
   display: flex;
   gap: 16px;

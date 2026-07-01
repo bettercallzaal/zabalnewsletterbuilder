@@ -7,6 +7,8 @@ import { voiceDo, voiceDont } from "@/lib/voice";
 import { useStatuses } from "@/lib/useStatuses";
 import { useDrafts, draftWords } from "@/lib/drafts";
 import { useNotes } from "@/lib/notes";
+import { downloadBackup, importState } from "@/lib/backup";
+import { useRef } from "react";
 
 const pillClass: Record<IssueStatus, string> = {
   next: "p-next",
@@ -31,6 +33,19 @@ export default function Dashboard() {
   const [filter, setFilter] = useState<Filter>("all");
   const [openNotes, setOpenNotes] = useState<number | null>(null);
   const [toast, setToast] = useState("");
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  function onImport(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    file.text().then((text) => {
+      const res = importState(text);
+      setToast(res.msg);
+      setTimeout(() => setToast(""), 1800);
+      if (res.ok) setTimeout(() => window.location.reload(), 700);
+    });
+    e.target.value = "";
+  }
   const drafted = issues.filter((i) => draftWords(drafts[i.n]) > 0).length;
 
   const shipped = issues.filter((i) => statuses[i.n] === "shipped").length;
@@ -222,6 +237,28 @@ export default function Dashboard() {
             ))}
           </ul>
         </div>
+      </div>
+
+      <h2>Data</h2>
+      <div className="databar">
+        <span className="sub">
+          your work lives in this browser. back it up or move it to another
+          device.
+        </span>
+        <span style={{ flex: 1 }} />
+        <button className="mini" onClick={downloadBackup}>
+          export backup
+        </button>
+        <button className="mini gold" onClick={() => fileRef.current?.click()}>
+          import
+        </button>
+        <input
+          ref={fileRef}
+          type="file"
+          accept="application/json"
+          style={{ display: "none" }}
+          onChange={onImport}
+        />
       </div>
 
       {toast && <div className="toast">{toast}</div>}
