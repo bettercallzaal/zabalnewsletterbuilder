@@ -4,9 +4,18 @@ import "./globals.css";
 import CommandPalette from "./CommandPalette";
 
 export const metadata: Metadata = {
-  title: "ZABAL Newsletter Builder",
+  metadataBase: new URL("https://zabalnewsletterbuilder.vercel.app"),
+  title: {
+    default: "ZABAL Newsletter Builder",
+    template: "%s",
+  },
   description:
-    "The ZAO daily-3 newsletter. Pipeline dashboard + issue composer in ZAO voice.",
+    "The ZAO daily-3 newsletter. Pipeline dashboard + issue composer in ZAO voice, with Farcaster and X variants.",
+  openGraph: {
+    title: "ZABAL Newsletter Builder",
+    description: "The ZAO daily-3 loop. 3 wins an issue, in voice.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
