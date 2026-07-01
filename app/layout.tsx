@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import "./globals.css";
+import CommandPalette from "./CommandPalette";
 
 export const metadata: Metadata = {
   title: "ZABAL Newsletter Builder",
@@ -24,8 +25,10 @@ export default function RootLayout({
             <Link href="/">Pipeline</Link>
             <Link href="/builder">Compose</Link>
             <Link href="/read">Read</Link>
+            <kbd className="kbdhint">Cmd K</kbd>
           </div>
         </nav>
+        <CommandPalette />
         <main className="wrap">{children}</main>
       </body>
     </html>
