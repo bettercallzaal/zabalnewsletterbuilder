@@ -1,14 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { issues, type IssueStatus } from "@/lib/issues";
+import { useRef, useState } from "react";
+import { type IssueStatus } from "@/lib/issues";
 import { voiceDo, voiceDont } from "@/lib/voice";
 import { useStatuses } from "@/lib/useStatuses";
 import { useDrafts, draftWords } from "@/lib/drafts";
 import { useNotes } from "@/lib/notes";
+import { useIssues } from "@/lib/useIssues";
 import { downloadBackup, importState } from "@/lib/backup";
-import { useRef } from "react";
 
 const pillClass: Record<IssueStatus, string> = {
   next: "p-next",
@@ -27,13 +27,37 @@ type Filter = "all" | IssueStatus;
 const filters: Filter[] = ["all", "next", "draft", "queued", "shipped"];
 
 export default function Dashboard() {
-  const { statuses, cycle, reset, ready, streak, nextIssue } = useStatuses();
+  const { list, ready: issuesReady } = useIssues();
+  const { statuses, cycle, reset, streak } = useStatuses();
   const { drafts } = useDrafts();
   const { notes, set: setNote } = useNotes();
   const [filter, setFilter] = useState<Filter>("all");
   const [openNotes, setOpenNotes] = useState<number | null>(null);
   const [toast, setToast] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
+
+  const ready = issuesReady;
+  const statusOf = (n: number, fallback: IssueStatus): IssueStatus =>
+    statuses[n] ?? fallback;
+
+  const shipped = list.filter((i) => statusOf(i.n, i.status) === "shipped").length;
+  const nextIssue = list.find((i) => statusOf(i.n, i.status) !== "shipped") ?? null;
+  const drafted = list.filter((i) => draftWords(drafts[i.n]) > 0).length;
+  const shown = list.filter(
+    (i) => filter === "all" || statusOf(i.n, i.status) === filter
+  );
+  const pct = list.length ? Math.round((shipped / list.length) * 100) : 0;
+
+  function copyBrief(n: number) {
+    const i = list.find((x) => x.n === n)!;
+    const brief = `Issue ${i.n} - ${i.theme}\n\n${i.wins
+      .map((w) => `- ${w}`)
+      .join("\n")}\n\nZOE needs: ${i.need || "n/a"}`;
+    navigator.clipboard.writeText(brief).then(() => {
+      setToast(`copied brief for issue ${n}`);
+      setTimeout(() => setToast(""), 1500);
+    });
+  }
 
   function onImport(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -45,25 +69,6 @@ export default function Dashboard() {
       if (res.ok) setTimeout(() => window.location.reload(), 700);
     });
     e.target.value = "";
-  }
-  const drafted = issues.filter((i) => draftWords(drafts[i.n]) > 0).length;
-
-  const shipped = issues.filter((i) => statuses[i.n] === "shipped").length;
-  const nextUp = issues.filter((i) => statuses[i.n] === "next").length;
-  const shown = issues.filter(
-    (i) => filter === "all" || statuses[i.n] === filter
-  );
-  const pct = Math.round((shipped / issues.length) * 100);
-
-  function copyBrief(n: number) {
-    const i = issues.find((x) => x.n === n)!;
-    const brief = `Issue ${i.n} - ${i.theme}\n\n${i.wins
-      .map((w) => `- ${w}`)
-      .join("\n")}\n\nZOE needs: ${i.need}`;
-    navigator.clipboard.writeText(brief).then(() => {
-      setToast(`copied brief for issue ${n}`);
-      setTimeout(() => setToast(""), 1500);
-    });
   }
 
   return (
@@ -78,23 +83,19 @@ export default function Dashboard() {
             advance it.
           </div>
         </div>
-        <button className="fbtn" onClick={reset} title="reset all statuses">
-          reset
-        </button>
+        <Link className="fbtn" href="/issues">
+          manage issues
+        </Link>
       </div>
 
       <div className="grid">
         <div className="stat">
-          <div className="n">{issues.length}</div>
+          <div className="n">{list.length}</div>
           <div className="l">issues</div>
         </div>
         <div className="stat">
-          <div className="n">{issues.length * 3}</div>
+          <div className="n">{list.length * 3}</div>
           <div className="l">wins queued</div>
-        </div>
-        <div className="stat">
-          <div className="n">{ready ? nextUp : "-"}</div>
-          <div className="l">next up</div>
         </div>
         <div className="stat">
           <div className="n">{ready ? shipped : "-"}</div>
@@ -104,6 +105,10 @@ export default function Dashboard() {
           <div className="n">{ready ? drafted : "-"}</div>
           <div className="l">drafts started</div>
         </div>
+        <div className="stat">
+          <div className="n">{ready ? `${pct}%` : "-"}</div>
+          <div className="l">complete</div>
+        </div>
       </div>
       <div className="barwrap">
         <div className="bar" style={{ width: `${ready ? pct : 0}%` }} />
@@ -112,7 +117,7 @@ export default function Dashboard() {
       {ready && nextIssue && (
         <div className="today">
           <div className="todaymain">
-            <div className="todaylabel">Today</div>
+            <div className="todaylabel">Next up</div>
             <div className="todayissue">
               Issue {nextIssue.n}: {nextIssue.theme}
             </div>
@@ -126,20 +131,6 @@ export default function Dashboard() {
             <Link className="mini gold" href={`/builder?issue=${nextIssue.n}`}>
               write it
             </Link>
-          </div>
-        </div>
-      )}
-      {ready && !nextIssue && (
-        <div className="today">
-          <div className="todaymain">
-            <div className="todaylabel">Series complete</div>
-            <div className="todayissue">all 9 issues shipped. keep building.</div>
-          </div>
-          <div className="todayside">
-            <div className="streak">
-              <span className="streaknum">{streak}</span>
-              <span className="streaklbl">day streak</span>
-            </div>
           </div>
         </div>
       )}
@@ -158,7 +149,7 @@ export default function Dashboard() {
       </div>
 
       {shown.map((i) => {
-        const st = statuses[i.n];
+        const st = statusOf(i.n, i.status);
         return (
           <div key={i.n} className={"issue" + (st === "shipped" ? " done" : "")}>
             <div className="ihead">
@@ -176,13 +167,13 @@ export default function Dashboard() {
               {i.wins.map((w, idx) => (
                 <li key={idx}>
                   <span className="dot">-</span>
-                  <span>{w}</span>
+                  <span>{w || <em style={{ color: "var(--dim)" }}>empty</em>}</span>
                 </li>
               ))}
             </ul>
             <div className="issuefoot">
               <div className="need">
-                <b>ZOE needs:</b> {i.need}
+                <b>ZOE needs:</b> {i.need || "n/a"}
               </div>
               <div className="issueactions">
                 {draftWords(drafts[i.n]) > 0 && (
@@ -190,10 +181,16 @@ export default function Dashboard() {
                     draft {draftWords(drafts[i.n])}w
                   </span>
                 )}
-                {notes[i.n]?.trim() && <span className="notedot" title="has notes">note</span>}
+                {notes[i.n]?.trim() && (
+                  <span className="notedot" title="has notes">
+                    note
+                  </span>
+                )}
                 <button
                   className="mini"
-                  onClick={() => setOpenNotes(openNotes === i.n ? null : i.n)}
+                  onClick={() =>
+                    setOpenNotes(openNotes === i.n ? null : i.n)
+                  }
                 >
                   {openNotes === i.n ? "hide notes" : "notes"}
                 </button>
@@ -251,6 +248,9 @@ export default function Dashboard() {
         </button>
         <button className="mini gold" onClick={() => fileRef.current?.click()}>
           import
+        </button>
+        <button className="mini" onClick={reset} title="reset all statuses">
+          reset statuses
         </button>
         <input
           ref={fileRef}

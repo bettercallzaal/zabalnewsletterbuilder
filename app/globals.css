@@ -534,6 +534,21 @@ textarea {
   padding: 2px 7px;
   background: var(--navy);
 }
+.editinput {
+  width: 100%;
+}
+.ihead .editinput {
+  flex: 1;
+  width: auto;
+}
+.mini.danger {
+  color: var(--red);
+  border-color: var(--line);
+}
+.mini:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
 .databar {
   display: flex;
   align-items: center;

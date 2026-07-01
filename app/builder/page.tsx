@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { issues } from "@/lib/issues";
+import { useIssues } from "@/lib/useIssues";
 import { voicePhrases } from "@/lib/voice";
 import { useDrafts, type Draft } from "@/lib/drafts";
 import { generateStarter } from "@/lib/starter";
@@ -12,6 +12,7 @@ import { toFarcaster, toXThread } from "@/lib/variants";
 
 function BuilderInner() {
   const params = useSearchParams();
+  const { list: issues } = useIssues();
   const { drafts, save, ready } = useDrafts();
   const initial = Math.max(
     0,

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { issues } from "@/lib/issues";
+import { useIssues } from "@/lib/useIssues";
 
 interface Cmd {
   label: string;
@@ -12,6 +12,7 @@ interface Cmd {
 
 export default function CommandPalette() {
   const router = useRouter();
+  const { list } = useIssues();
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const [sel, setSel] = useState(0);
@@ -22,13 +23,14 @@ export default function CommandPalette() {
       { label: "Pipeline", hint: "dashboard", go: "/" },
       { label: "Compose", hint: "new issue", go: "/builder" },
       { label: "Read the series", hint: "print / export", go: "/read" },
-      ...issues.map((i) => ({
+      { label: "Manage issues", hint: "edit / reorder", go: "/issues" },
+      ...list.map((i) => ({
         label: `Compose issue ${i.n}: ${i.theme}`,
         hint: "compose",
         go: `/builder?issue=${i.n}`,
       })),
     ],
-    []
+    [list]
   );
 
   const results = useMemo(() => {

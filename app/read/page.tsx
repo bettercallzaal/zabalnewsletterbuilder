@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { issues } from "@/lib/issues";
+import { useIssues } from "@/lib/useIssues";
 import { useDrafts, draftWords } from "@/lib/drafts";
 import { generateStarter } from "@/lib/starter";
 import { assemblePost } from "@/lib/assemble";
 
 export default function Read() {
+  const { list: issues } = useIssues();
   const { drafts, ready } = useDrafts();
   const [onlyWritten, setOnlyWritten] = useState(false);
   const [toast, setToast] = useState("");
