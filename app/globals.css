@@ -424,6 +424,18 @@ textarea {
   color: var(--red);
   padding: 2px 0;
 }
+.socialbar {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 8px;
+}
+@media (max-width: 640px) {
+  .socialbar {
+    grid-template-columns: 1fr;
+  }
+}
 .vtabs {
   display: flex;
   gap: 6px;
