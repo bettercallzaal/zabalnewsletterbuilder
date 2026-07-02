@@ -33,6 +33,7 @@ export default function RootLayout({
           <div className="navlinks">
             <Link href="/">Pipeline</Link>
             <Link href="/builder">Compose</Link>
+            <Link href="/socials">Socials</Link>
             <Link href="/read">Read</Link>
             <kbd className="kbdhint">Cmd K</kbd>
           </div>
