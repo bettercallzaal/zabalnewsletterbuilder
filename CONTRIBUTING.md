@@ -29,6 +29,6 @@ The whole first day of this repo was built exactly this way: 13 small passes, ea
 
 ## Voice
 
-If you touch anything user-facing, keep the ZAO voice: lowercase-casual, lead with the build, real numbers, no emojis, no em dashes. See the "Voice" section in the README.
+If you touch anything user-facing, keep the ZAO voice: lowercase-casual, lead with the build, real numbers, no emojis, no em dashes, no work-day time references. Every post opens with "ZM". See the "Voice" section in the README and the full rules in [NEWSLETTER-UPDATE.md](./NEWSLETTER-UPDATE.md).
 
 builders building for builders.

@@ -6,6 +6,10 @@ The ZAO daily-3 newsletter, as a Vercel app. A pipeline dashboard plus an issue 
 
 The Q2 recap was one big post nobody reads twice. This reframes it into a daily series: one issue = 3 wins, tight, in voice, built to get better each day. See Doc 930 (the loop), Doc 928 (Q2 wins), Doc 929 (full record) in the ZAO OS repo.
 
+## Producing an issue
+
+See [NEWSLETTER-UPDATE.md](./NEWSLETTER-UPDATE.md) - the full runbook for creating, drafting, grading, and publishing a daily issue (any session can follow it). [BUILD-LOG.md](./BUILD-LOG.md) is the day-by-day record.
+
 ## Pages
 
 - `/` - Pipeline. The 9-issue sequence (biggest-first), each with its 3 wins, status, and what ZOE still needs. Filter by status. Voice guardrails at the bottom.
