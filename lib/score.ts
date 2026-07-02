@@ -25,6 +25,9 @@ export function scorePost(post: string): Scored {
       post
     );
   const hasCTA = /\b(check it out|link in bio|read more|learn more|click here|sign up now)\b/i.test(post);
+  const hasHashtag = /(^|\s)#\w/.test(post);
+  // spaced-hyphen used as a dash/connector mid-line (the signoff "- ..." at line start is fine)
+  const hasSpacedHyphen = /\S - \S/.test(post.replace(/\n- .*/g, ""));
 
   const checks: Check[] = [
     { label: 'opens with "ZM."', pass: post.trimStart().startsWith("ZM.") },
@@ -36,7 +39,9 @@ export function scorePost(post: string): Scored {
     { label: "no work-day time phrases (timeless)", pass: !hasTimePhrase },
     { label: "no CTA labels", pass: !hasCTA },
     { label: "no emojis", pass: !hasEmoji },
+    { label: "no hashtags", pass: !hasHashtag },
     { label: "no em dashes", pass: !hasEmDash },
+    { label: "no spaced-hyphen connector", pass: !hasSpacedHyphen },
     { label: "no hype words", pass: !hasBanned },
     { label: "signs off as the ZABAL Team", pass: /ZABAL Team/.test(post) },
   ];
