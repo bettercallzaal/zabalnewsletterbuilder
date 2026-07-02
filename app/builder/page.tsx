@@ -9,6 +9,7 @@ import { generateStarter } from "@/lib/starter";
 import { assemblePost } from "@/lib/assemble";
 import { scorePost } from "@/lib/score";
 import { toFarcaster, toXThread } from "@/lib/variants";
+import { zabalTitle } from "@/lib/title";
 
 function BuilderInner() {
   const params = useSearchParams();
@@ -28,6 +29,12 @@ function BuilderInner() {
   const [closer, setCloser] = useState(seed.closer);
   const [toast, setToast] = useState("");
   const [saved, setSaved] = useState(false);
+  const [title, setTitle] = useState("");
+
+  // computed client-side to avoid a build-time date (and hydration mismatch)
+  useEffect(() => {
+    setTitle(zabalTitle(new Date()));
+  }, []);
 
   // load the saved draft for an issue, or open a starter pre-filled from its wins
   function loadDraft(n: number) {
@@ -113,6 +120,20 @@ function BuilderInner() {
         pick an issue, draft the 3 win blocks, watch it assemble in voice. copy
         when it reads right.
       </div>
+
+      {title && (
+        <div className="databar" style={{ marginTop: 12 }}>
+          <span className="sub">Paragraph title</span>
+          <strong style={{ color: "var(--gold)" }}>{title}</strong>
+          <span style={{ flex: 1 }} />
+          <button
+            className="mini gold"
+            onClick={() => copyText(title, "copied title")}
+          >
+            copy title
+          </button>
+        </div>
+      )}
 
       <div className="composer">
         <div>
