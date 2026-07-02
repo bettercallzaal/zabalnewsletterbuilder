@@ -35,6 +35,29 @@ How to produce and publish a ZAO daily newsletter issue. Any session can follow 
 1. Paste the finished post into **The ZAO Newsletter on Paragraph** (paragraph.com/@thezao). Title format below. Add the header image.
 2. Run `/socials` to generate platform posts, then post top-to-bottom (Firefly, X GC, Farcaster GC, Telegram, Discord, LinkedIn, Facebook).
 
+## Generate socials after publishing (required)
+
+After publishing each daily issue, generate that day's social posts, built from the published issue, and output a `/clipboard` page in posting order with a copy button per post. Do NOT auto-post - Zaal posts them himself.
+
+Posting order (each its own copy block):
+1. Firefly (Farcaster + X, ONE post, max 280 chars - show the char count)
+2. X group chat
+3. Farcaster /zao group chat
+4. Telegram
+5. Discord
+6. LinkedIn (add one line of context: The ZAO = a decentralized network for independent artists)
+7. Facebook (warm, less jargon)
+
+Hard rules (all platforms):
+- open with "ZM". no emojis, no hashtags, no em dashes.
+- NEVER work-day time references ("today", "this morning", "by tonight"). timeless only ("had it live the same day").
+- lead with what shipped, concrete. no "excited/thrilled/amazing". no "check it out" CTAs.
+- lowercase-casual to match voice. each platform sounds distinct, not duplicated.
+- include the live link where it fits: zabalnewsletterbuilder.vercel.app
+- submission framing: a PR that adds one small thing to any lab repo IS a ZABAL Gamez submission. bar = one small shippable move.
+
+The `/socials` skill covers this; feed it the published issue and enforce the order + rules above.
+
 ## Run + deploy the app
 
 ```bash
