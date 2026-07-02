@@ -58,6 +58,10 @@ Then the dashboard "Cloud sync" section lets you push/pull all state under a wor
 - Engagement column: track what landed, weight next issue.
 - Push a finished issue straight to Paragraph / the socials pipeline.
 
+## Contributing (ZABAL Gamez submissions)
+
+Small additions welcome. Pick one thing, add it, open a PR - that PR is a ZABAL Gamez submission. No minimum size. See [CONTRIBUTING.md](./CONTRIBUTING.md) for good first tasks, and [BUILD-LOG.md](./BUILD-LOG.md) for the day-one record (13 passes, each a template for a submission).
+
 ## Voice
 
 Sourced from the ZAO OS repo: `.claude/skills/zao-os/brand-voice.md`, `bot/src/zoe/brand.md`, `.claude/skills/newsletter/voice-reference.md`. Open "ZM.", lead with the build, real numbers, no emojis, no em dashes, sign off as the ZABAL Team.
