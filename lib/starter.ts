@@ -28,14 +28,3 @@ export function generateStarter(issue: Issue): Draft {
     closer: "the quiet work compounds.",
   };
 }
-
-// Is a draft still just the untouched starter (nothing real added yet)?
-export function isStarter(issue: Issue, d: Draft | undefined): boolean {
-  if (!d) return false;
-  const gen = generateStarter(issue);
-  return (
-    d.themeLine === gen.themeLine &&
-    d.closer === gen.closer &&
-    d.blocks.join("|") === gen.blocks.join("|")
-  );
-}

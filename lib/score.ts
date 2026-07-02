@@ -20,6 +20,11 @@ export function scorePost(post: string): Scored {
   const paras = post.split(/\n\s*\n/).filter((p) => p.trim().length > 0);
   const longParas = paras.filter((p) => p.split(/\s+/).length > 55).length;
   const noTodo = !/\[todo\]|\[write |\[theme line\]|\[lead with/i.test(post);
+  const hasTimePhrase =
+    /\b(this morning|this afternoon|this evening|today|tonight|by tonight|tomorrow|yesterday|next week|last night)\b/i.test(
+      post
+    );
+  const hasCTA = /\b(check it out|link in bio|read more|learn more|click here|sign up now)\b/i.test(post);
 
   const checks: Check[] = [
     { label: 'opens with "ZM."', pass: post.trimStart().startsWith("ZM.") },
@@ -28,6 +33,8 @@ export function scorePost(post: string): Scored {
     { label: "has at least one real number", pass: /\d/.test(post) },
     { label: "includes a link", pass: /https?:\/\/|\.com|\.xyz|\.online|\.fund/i.test(post) },
     { label: "short paragraphs (none over ~55 words)", pass: longParas === 0 },
+    { label: "no work-day time phrases (timeless)", pass: !hasTimePhrase },
+    { label: "no CTA labels", pass: !hasCTA },
     { label: "no emojis", pass: !hasEmoji },
     { label: "no em dashes", pass: !hasEmDash },
     { label: "no hype words", pass: !hasBanned },

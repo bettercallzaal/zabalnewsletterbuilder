@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { type IssueStatus } from "@/lib/issues";
 import { voiceDo, voiceDont } from "@/lib/voice";
 import { useStatuses } from "@/lib/useStatuses";
@@ -11,7 +11,6 @@ import { useIssues } from "@/lib/useIssues";
 import { downloadBackup, importState } from "@/lib/backup";
 import { hasSupabase } from "@/lib/supabase";
 import { pushCloud, pullCloud } from "@/lib/cloud";
-import { useEffect } from "react";
 
 const pillClass: Record<IssueStatus, string> = {
   next: "p-next",

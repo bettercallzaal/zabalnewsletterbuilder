@@ -48,8 +48,8 @@ Deploy: **push to `main` -> Vercel auto-deploys** to zabalnewsletterbuilder.verc
 
 ## The voice grader
 
-`lib/score.ts` scores an assembled post 0-100 across 10 checks:
-opens with "ZM.", all win blocks written (no placeholders), 250-480 words, has a real number, includes a link, short paragraphs (none over ~55 words), no emojis, no em dashes, no hype words, signs off as the ZABAL Team.
+`lib/score.ts` scores an assembled post 0-100 across 12 checks:
+opens with "ZM.", all win blocks written (no placeholders), 250-480 words, has a real number, includes a link, short paragraphs (none over ~55 words), no work-day time phrases (timeless), no CTA labels, no emojis, no em dashes, no hype words, signs off as the ZABAL Team.
 
 **Passing = 80 or higher (8 of 10).** Aim for 90+. The composer shows the live score and which checks fail.
 
