@@ -2,6 +2,7 @@
   "name": "zabalnewsletterbuilder",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "description": "The ZAO daily-3 newsletter builder. Pipeline dashboard + issue composer in ZAO voice.",
   "scripts": {
     "dev": "next dev",
