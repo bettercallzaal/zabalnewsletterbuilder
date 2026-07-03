@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useIssues } from "@/lib/useIssues";
 import { voicePhrases } from "@/lib/voice";
 import { useDrafts, type Draft } from "@/lib/drafts";
-import { generateStarter } from "@/lib/starter";
+import { generateStarter, contextHint } from "@/lib/starter";
 import { assemblePost } from "@/lib/assemble";
 import { scorePost } from "@/lib/score";
 import { toFarcaster, toXThread } from "@/lib/variants";
@@ -23,6 +23,7 @@ function BuilderInner() {
   const [idx, setIdx] = useState(initial);
   const issue = issues[idx];
   const seed = generateStarter(issues[initial]);
+  const ctx = contextHint();
 
   const [themeLine, setThemeLine] = useState(seed.themeLine);
   const [blocks, setBlocks] = useState<string[]>(seed.blocks);
@@ -134,6 +135,30 @@ function BuilderInner() {
           </button>
         </div>
       )}
+
+      <details className="ctxpanel" style={{ marginTop: 12, border: "1px solid var(--line, #333)", borderRadius: 8, padding: "8px 12px" }}>
+        <summary style={{ cursor: "pointer", color: "var(--gold)", fontWeight: 600 }}>
+          context - real links + verified numbers to pull from
+        </summary>
+        <div style={{ marginTop: 10, fontSize: 13, lineHeight: 1.6 }}>
+          <div className="sub" style={{ marginBottom: 6 }}>links (drop one per win)</div>
+          <ul style={{ margin: "0 0 12px", paddingLeft: 18 }}>
+            {ctx.links.map((l) => (
+              <li key={l.label}>
+                <code>{l.url}</code> - {l.what}
+              </li>
+            ))}
+          </ul>
+          <div className="sub" style={{ marginBottom: 6 }}>numbers (verified; check the asOf date)</div>
+          <ul style={{ margin: 0, paddingLeft: 18 }}>
+            {ctx.facts.map((f) => (
+              <li key={f.label}>
+                <strong>{f.label}:</strong> {f.value} <span className="sub">({f.asOf})</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </details>
 
       <div className="composer">
         <div>
