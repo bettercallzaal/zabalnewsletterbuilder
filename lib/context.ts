@@ -59,6 +59,19 @@ export const ECOSYSTEM: EcosystemEntity[] = [
   { name: "ZAOstock", oneLiner: "the festival - Oct 3 2026 at Franklin St Parklet." },
 ];
 
+// HOW I WANT YOU TO WORK - the behavioral contract for any agent/writer using
+// this context (the piece of the persistent-context pattern we had not yet
+// formalized; see research doc 958). These ride along with the facts so every
+// consumer inherits the same working rules.
+export const HOW_TO_WORK: string[] = [
+  "Every recommendation carries an impact level (high/medium/low) and a time-to-results estimate.",
+  "Comparisons come back as a table with exact copy to use, not instructions to write copy.",
+  "Say when unsure. Never fill a gap with a guess - name the gap and where to verify.",
+  "Numbers only from CONTEXT_FACTS or a source you can cite with a date. Never invent a figure.",
+  "Links only from CANONICAL_LINKS or the issue itself. Never guess a URL.",
+  "Final outbound voice stays human - drafts are specs, Zaal does the last pass.",
+];
+
 // Convenience: find a link by label for a starter hint.
 export function linkByLabel(label: string): ContextLink | undefined {
   return CANONICAL_LINKS.find((l) => l.label === label);

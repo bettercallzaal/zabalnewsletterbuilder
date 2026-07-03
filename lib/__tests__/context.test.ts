@@ -3,6 +3,7 @@ import {
   CANONICAL_LINKS,
   CONTEXT_FACTS,
   ECOSYSTEM,
+  HOW_TO_WORK,
   linkByLabel,
 } from "@/lib/context";
 
@@ -60,5 +61,20 @@ describe("linkByLabel", () => {
   it("resolves a known label and returns undefined for an unknown one", () => {
     expect(linkByLabel("wwtracker")?.url).toContain("wwtracker");
     expect(linkByLabel("does-not-exist")).toBeUndefined();
+  });
+});
+
+describe("HOW_TO_WORK behavioral contract", () => {
+  it("exists and every rule is a non-empty sentence", () => {
+    expect(HOW_TO_WORK.length).toBeGreaterThanOrEqual(4);
+    for (const rule of HOW_TO_WORK) {
+      expect(rule.trim().length).toBeGreaterThan(10);
+    }
+  });
+
+  it("carries the two hard rules: never invent a figure, never guess a URL", () => {
+    const all = HOW_TO_WORK.join(" ").toLowerCase();
+    expect(all).toContain("never invent a figure");
+    expect(all).toContain("never guess a url");
   });
 });
