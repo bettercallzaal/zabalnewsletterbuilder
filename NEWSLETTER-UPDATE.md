@@ -8,12 +8,24 @@ How to produce and publish a ZAO daily newsletter issue. Any session can follow 
 - **The newsletter itself** is published on Paragraph: **The ZAO Newsletter** (paragraph.com/@thezao). You paste the finished post there.
 - **Socials** go out via the `/socials` skill (Firefly for Farcaster+X, plus GCs/LinkedIn/Facebook).
 
+## Context (real links + verified numbers)
+
+`lib/context.ts` is the single source of the canonical links, verified numbers, and one-line
+ecosystem descriptions a writer pulls into a draft - so issues carry accurate depth instead of
+guessed URLs or estimated figures. It shows as a collapsible **context** panel at the top of
+`/builder`. Every number carries an `asOf` date and a `verify` pointer.
+
+Rule: when a number moves (e.g. a WaveWarZ figure, treasury balance, an event date), update it in
+`lib/context.ts` in ONE place - never let a draft estimate it. Never invent a figure; if it is not
+verified, leave it out.
+
 ## Where the content lives
 
 | Thing | Location |
 |-------|----------|
 | The daily-3 issue sequence (theme + 3 wins each) | `lib/issues.ts` (seed) + user edits via the `/issues` page (localStorage) |
 | Voice rules the grader + composer enforce | `lib/voice.ts` |
+| Ecosystem context (real links + verified numbers to pull from) | `lib/context.ts` (shown as the "context" panel in `/builder`) |
 | Voice score logic | `lib/score.ts` |
 | Per-platform variants (Farcaster long-cast, X thread) | `lib/variants.ts` |
 | Starter-draft generator (pre-fills the composer) | `lib/starter.ts` |
