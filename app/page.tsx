@@ -84,21 +84,33 @@ export default function Dashboard() {
     const brief = `Issue ${i.n} - ${i.theme}\n\n${i.wins
       .map((w) => `- ${w}`)
       .join("\n")}\n\nZOE needs: ${i.need || "n/a"}`;
-    navigator.clipboard.writeText(brief).then(() => {
-      setToast(`copied brief for issue ${n}`);
-      setTimeout(() => setToast(""), 1500);
-    });
+    navigator.clipboard.writeText(brief)
+      .then(() => {
+        setToast(`copied brief for issue ${n}`);
+        setTimeout(() => setToast(""), 1500);
+      })
+      .catch((err) => {
+        console.error("clipboard failed:", err);
+        setToast("copy failed - try again");
+        setTimeout(() => setToast(""), 1500);
+      });
   }
 
   function onImport(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    file.text().then((text) => {
-      const res = importState(text);
-      setToast(res.msg);
-      setTimeout(() => setToast(""), 1800);
-      if (res.ok) setTimeout(() => window.location.reload(), 700);
-    });
+    file.text()
+      .then((text) => {
+        const res = importState(text);
+        setToast(res.msg);
+        setTimeout(() => setToast(""), 1800);
+        if (res.ok) setTimeout(() => window.location.reload(), 700);
+      })
+      .catch((err) => {
+        console.error("file read failed:", err);
+        setToast("import failed - try again");
+        setTimeout(() => setToast(""), 1800);
+      });
     e.target.value = "";
   }
 

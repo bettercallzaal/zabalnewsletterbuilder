@@ -26,10 +26,16 @@ export default function Read() {
     .join("\n\n---\n\n");
 
   function copyAll() {
-    navigator.clipboard.writeText(seriesText).then(() => {
-      setToast("copied the whole series");
-      setTimeout(() => setToast(""), 1600);
-    });
+    navigator.clipboard.writeText(seriesText)
+      .then(() => {
+        setToast("copied the whole series");
+        setTimeout(() => setToast(""), 1600);
+      })
+      .catch((err) => {
+        console.error("clipboard failed:", err);
+        setToast("copy failed - try again");
+        setTimeout(() => setToast(""), 1600);
+      });
   }
 
   function download() {
