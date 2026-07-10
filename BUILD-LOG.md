@@ -2,6 +2,12 @@
 
 The memory of this repo. What got built, when, and why. Newest first.
 
+Header convention for every entry from here on: `## YYYY-MM-DD - Day N (Year of the ZABAL, Day M)`
+where N is this repo's own build-day count and M is the calendar-day count in the Year of the
+ZABAL series (see zaoonparagraph's daily-3 template for how M is derived). This is an internal
+dev log, not the public newsletter - bullet lists and dev-facing detail are fine here even though
+the newsletter itself never uses them.
+
 ## Day 1 - 2026-07-01 (Year of the ZABAL, Day 182)
 
 Started this morning, live on Vercel by tonight. Day one of building on ZABAL Gamez, in the open, one improvement per pass, each shipped live before the next.
