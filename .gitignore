@@ -8,5 +8,8 @@ out
 .vercel
 next-env.d.ts
 
+# build artifact
+tsconfig.tsbuildinfo
+
 # TS incremental build cache
 *.tsbuildinfo
