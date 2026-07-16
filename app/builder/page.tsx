@@ -101,10 +101,16 @@ function BuilderInner() {
   const xThread = useMemo(() => toXThread(post), [post]);
 
   function copyText(text: string, label = "copied") {
-    navigator.clipboard.writeText(text).then(() => {
-      setToast(label);
-      setTimeout(() => setToast(""), 1500);
-    });
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        setToast(label);
+        setTimeout(() => setToast(""), 1500);
+      })
+      .catch((err) => {
+        console.error("clipboard failed:", err);
+        setToast("copy failed - try again");
+        setTimeout(() => setToast(""), 1500);
+      });
   }
   function copy() {
     copyText(post);
