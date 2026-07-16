@@ -1,5 +1,6 @@
 import type { Issue } from "@/lib/issues";
 import type { Draft } from "@/lib/drafts";
+import { CANONICAL_LINKS, ECOSYSTEM, linkByLabel } from "@/lib/context";
 
 export interface SocialPost {
   key: string;
@@ -12,6 +13,29 @@ const lc = (s: string) => (s ? s.charAt(0).toLowerCase() + s.slice(1) : s);
 const cap = (s: string) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
 const strip = (s: string) => s.trim().replace(/[.\s]+$/, "");
 
+// Resolve the link every cross-post carries, through the canonical context:
+// - a canonical label ("wwtracker") expands to its real URL
+// - a raw URL passes through untouched
+// - empty: scan the issue's theme + wins for a known ecosystem entity and use
+//   its first canonical link; fall back to the newsletter itself.
+// Cross-posts always carry a REAL link from lib/context.ts, never a guessed one.
+export function resolveLink(issue: Issue, draft: Draft, link: string): string {
+  const raw = link.trim();
+  if (raw) {
+    const byLabel = linkByLabel(raw.toLowerCase());
+    return byLabel ? byLabel.url : raw;
+  }
+  const hay = `${draft.themeLine} ${issue.theme} ${issue.wins.join(" ")}`.toLowerCase();
+  for (const entity of ECOSYSTEM) {
+    if (!entity.links?.length) continue;
+    if (hay.includes(entity.name.toLowerCase())) {
+      const first = linkByLabel(entity.links[0]);
+      if (first) return first.url;
+    }
+  }
+  return CANONICAL_LINKS.find((l) => l.label === "newsletter")?.url ?? "";
+}
+
 // Generate the day's posts in posting order from an issue + its draft.
 // Editable starting drafts - Zaal refines, then copies. Never auto-posts.
 export function generatePosts(
@@ -22,7 +46,8 @@ export function generatePosts(
   const theme = strip(draft.themeLine) || strip(issue.theme);
   const wins = issue.wins.map((w) => strip(w)).filter(Boolean);
   const w0 = wins[0] ?? "";
-  const linkPart = link.trim() ? ` ${link.trim()}` : "";
+  const resolved = resolveLink(issue, draft, link);
+  const linkPart = resolved ? ` ${resolved}` : "";
 
   // Firefly: punchy, <=280. Drop the middle sentence if over.
   let firefly = `ZM. ${theme}. ${lc(w0)}. a PR that adds one small thing is a submission.${linkPart}`;
@@ -38,7 +63,7 @@ export function generatePosts(
   const discord = `ZM. ${theme}. ${lc(w0)}. easiest way in: pick any lab repo, add one small thing, open a PR. what would you add first?${linkPart}`;
 
   const linkedin = `ZM. ${theme}. The ZAO is a decentralized network for independent artists. ${cap(w0)}. the invite is simple: add one small thing to any project and open a pull request. that is a submission.${
-    link.trim() ? `\n\n${link.trim()}` : ""
+    resolved ? `\n\n${resolved}` : ""
   }`;
 
   const facebook = `ZM. ${theme}. small contributions count here. ${lc(w0)}. if you can add one little improvement to a project, that is a win.${linkPart}`;

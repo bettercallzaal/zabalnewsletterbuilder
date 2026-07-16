@@ -48,17 +48,29 @@ function SocialsInner() {
     return edited[p.key] ?? p.text;
   }
   function copy(p: SocialPost) {
-    navigator.clipboard.writeText(textFor(p)).then(() => {
-      setToast(`copied ${p.label}`);
-      setTimeout(() => setToast(""), 1400);
-    });
+    navigator.clipboard.writeText(textFor(p))
+      .then(() => {
+        setToast(`copied ${p.label}`);
+        setTimeout(() => setToast(""), 1400);
+      })
+      .catch((err) => {
+        console.error("clipboard failed:", err);
+        setToast("copy failed - try again");
+        setTimeout(() => setToast(""), 1400);
+      });
   }
   function copyAll() {
     const all = posts.map((p) => `${p.label}\n\n${textFor(p)}`).join("\n\n---\n\n");
-    navigator.clipboard.writeText(all).then(() => {
-      setToast("copied all posts");
-      setTimeout(() => setToast(""), 1400);
-    });
+    navigator.clipboard.writeText(all)
+      .then(() => {
+        setToast("copied all posts");
+        setTimeout(() => setToast(""), 1400);
+      })
+      .catch((err) => {
+        console.error("clipboard failed:", err);
+        setToast("copy failed - try again");
+        setTimeout(() => setToast(""), 1400);
+      });
   }
 
   if (!issue) return <div className="sub">no issues. add one in Manage.</div>;
