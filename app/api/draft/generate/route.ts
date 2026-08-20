@@ -4,6 +4,7 @@ import { generateStarter } from "@/lib/starter";
 import { assemblePost, wordCount } from "@/lib/assemble";
 import { scorePost } from "@/lib/score";
 import { zabalTitle } from "@/lib/title";
+import { buildAutoDraftRow, saveAutoDraft } from "@/lib/autodraft";
 import type { Draft } from "@/lib/drafts";
 
 /**
@@ -81,17 +82,36 @@ export async function POST(request: NextRequest) {
     const scored = scorePost(post);
 
     // Generate the title (using today's date)
-    const title = zabalTitle(new Date());
+    const now = new Date();
+    const title = zabalTitle(now);
+    const words = wordCount(post);
+
+    // Persist so the overnight cron's output survives to the morning - the
+    // builder loads it back from the cloud table. A failed persist is reported
+    // in the response, never swallowed: a cron that generates into a discarded
+    // HTTP response stages nothing.
+    const row = buildAutoDraftRow({
+      issue: targetIssue,
+      draft,
+      post,
+      words,
+      score: scored.score,
+      title,
+      now,
+    });
+    const persist = await saveAutoDraft(row);
 
     return NextResponse.json({
       success: true,
       draft,
       issue: targetIssue,
       post,
-      words: wordCount(post),
+      words,
       score: scored.score,
       title,
-      generated_at: new Date().toISOString(),
+      persisted: persist.ok,
+      persist_msg: persist.msg,
+      generated_at: now.toISOString(),
     });
   } catch (error) {
     console.error("Failed to generate draft:", error);

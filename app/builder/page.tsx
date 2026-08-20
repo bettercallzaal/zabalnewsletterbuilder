@@ -6,6 +6,7 @@ import { useIssues } from "@/lib/useIssues";
 import { voicePhrases } from "@/lib/voice";
 import { useDrafts, type Draft } from "@/lib/drafts";
 import { generateStarter, contextHint } from "@/lib/starter";
+import { loadLatestAutoDraft } from "@/lib/autodraft";
 import { assemblePost } from "@/lib/assemble";
 import { scorePost } from "@/lib/score";
 import { toFarcaster, toXThread } from "@/lib/variants";
@@ -54,6 +55,21 @@ function BuilderInner() {
     setCloser(gen.closer);
     setToast("starter regenerated");
     setTimeout(() => setToast(""), 1500);
+  }
+
+  // pull the overnight cron's staged draft from the cloud into the editor
+  async function loadAutoDraft() {
+    const row = await loadLatestAutoDraft();
+    if (!row) {
+      setToast("no auto-draft in cloud");
+      setTimeout(() => setToast(""), 2500);
+      return;
+    }
+    setThemeLine(row.draft.themeLine);
+    setBlocks(row.draft.blocks.length === 3 ? row.draft.blocks : ["", "", ""]);
+    setCloser(row.draft.closer);
+    setToast(`loaded auto-draft from ${row.date} (score ${row.score})`);
+    setTimeout(() => setToast(""), 2500);
   }
 
   // once drafts have loaded from storage, hydrate the current issue's draft
@@ -312,6 +328,9 @@ function BuilderInner() {
             </button>
             <button className="btn ghost" onClick={regenStarter}>
               Regenerate starter
+            </button>
+            <button className="btn ghost" onClick={loadAutoDraft}>
+              Load overnight draft
             </button>
             <span className="wc" style={{ alignSelf: "center" }}>
               ZOE needs: {issue.need}
